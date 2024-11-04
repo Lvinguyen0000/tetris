@@ -30,7 +30,9 @@ function loadKeyDownEvents(gameBlock){
 
 function loadKeyUpEvents(gameBlock){
     keyUpEventListener = (event) => {
-        event.preventDefault();
+        if (["ArrowRight", "ArrowLeft", "a", "d"].includes(event.key)) {
+            event.preventDefault();
+        }
         switch (event.key) {
             case "ArrowRight":
                 gameBlock.moveRight(ctx);
@@ -82,18 +84,27 @@ function animate(){
 
 let canvas = document.getElementById("gWindow");
 let ctx = canvas.getContext("2d");
-let startX = canvas.width*(Math.floor(Math.random() * 5) * 10)/100;
+let startX = canvas.width*3/10;
 let block_W = canvas.width*10/100;
-let block_H = canvas.height*10/100;
+let block_H = canvas.height*5/100;
 let interval = null;
 let board, gameBlock;
 let keyDownEventListener = null;
 let keyUpEventListener = null;
+let speed = 50;
+
+document.getElementById("speedBtn").onclick = function(){
+    speed = document.getElementById("speed").value;
+}
 
 document.addEventListener("keydown", (event) => {
-    event.preventDefault();
+    if ([" ", "p", "o"].includes(event.key)) {
+        event.preventDefault();
+    }
     if (event.key === " ") {
         clearInterval(interval);
+
+        document.getElementById("scoreValue").textContent = 0;
 
         document.removeEventListener("keydown", keyDownEventListener);
         document.removeEventListener("keyup", keyUpEventListener);
@@ -106,10 +117,16 @@ document.addEventListener("keydown", (event) => {
 
         //loadKeyDownEvents(gameBlock);
         loadKeyUpEvents(gameBlock);
-        interval = setInterval(animate, 500);
+        interval = setInterval(animate, speed);
     }
 
-    else if (event.ket === "Enter") {
+    else if (event.key === "p") {
         clearInterval(interval);
+    }
+    else if (event.key === "o") {
+        document.removeEventListener("keydown", keyDownEventListener);
+        document.removeEventListener("keyup", keyUpEventListener);
+        loadKeyUpEvents(gameBlock);
+        interval = setInterval(animate, speed);
     }
 });

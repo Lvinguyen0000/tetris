@@ -5,12 +5,12 @@ class Board{
 
         this.colisionArr = [];
         for (let i = 0; i <this.width; i += this.width*10/100){
-            this.colisionArr.push([i, this.height - this.height*10/100]);
+            this.colisionArr.push([i, this.height - this.height*5/100]);
         }
 
         this.rowArr = [];
-        for (let i =0; i < this.height; i += this.height*10/100){
-            this.rowArr.push(new Row(i, this.width*10/100, this.height*10/100, this.width));
+        for (let i =0; i < this.height; i += this.height*5/100){
+            this.rowArr.push(new Row(i, this.width*10/100, this.height*5/100, this.width));
         }
     }
 
@@ -58,30 +58,39 @@ class Board{
 
                 //splice the row
                 this.rowArr.splice(i, 1);
+
+                let scoreDiv = document.getElementById("scoreValue");
+                if (!+scoreDiv.textContent) { scoreDiv.textContent = 1; }
+                else {
+                    scoreDiv.textContent = parseInt(scoreDiv.textContent) + parseInt(scoreDiv.textContent);
+                }
             }
         }
         
         if (rowToDelete){
             //for each deleted row, unshift a new row
             for (let i = 0; i < rowToDelete; i++) {
-                this.rowArr.unshift(new Row((rowToDelete -i -1) * (this.height*10/100), this.width*10/100, this.height*10/100, this.width));
+                this.rowArr.unshift(new Row((rowToDelete -i -1) * (this.height*5/100), this.width*10/100, this.height*10/100, this.width));
             }
 
             //for every elemnt in colisionArr, update element with y < lowestY
             for (let i in this.colisionArr) {
-                if (this.colisionArr[i][1] < lowestY) {
-                    this.colisionArr[i][1] += this.height*10/100 * rowToDelete;
+                if (this.colisionArr[i][1] + this.height*5/100 < lowestY) {
+                    this.colisionArr[i][1] += this.height*5/100 * rowToDelete;
                 }
 
                 //if y == lowestY, find the row with with the lowest y with the same x
-                else if (this.colisionArr[i][1] == lowestY) {
+                else if (this.colisionArr[i][1] + this.height*5/100 == lowestY) {
+                    let isAvail = false;
                     for (let j in this.rowArr) {
                         if (this.rowArr[j].y > lowestY && this.rowArr[j].map.has(this.colisionArr[i][0]) && this.rowArr[j].map.get(this.colisionArr[i][0]).block) {
-                            this.colisionArr[i][1] = this.rowArr[j].y;
+                            this.colisionArr[i][1] = this.rowArr[j].y - this.height*5/100;
+                            isAvail = true;
+                            break;
                         }
-                        else if (lowestY == this.height - this.height*10/100*2) {
-                            this.colisionArr[i][1] = this.height - this.height*10/100;
-                        }
+                    }
+                    if (!isAvail) {
+                        this.colisionArr[i][1] = this.height - this.height*5/100;
                     }
                 }
             }
